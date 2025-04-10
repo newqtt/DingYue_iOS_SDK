@@ -228,6 +228,7 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
         //传给内购页的数据字典
         var dic = [
             "system_language":languageCode,
+            "country_code":Locale.current.regionCode ?? "",
             "products":productsArray
         ] as [String : Any]
         
