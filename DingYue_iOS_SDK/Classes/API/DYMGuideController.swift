@@ -18,6 +18,8 @@ import NVActivityIndicatorView
     @objc optional func clickGuideCloseButton(baseViewController:UIViewController,closeType:String)//关闭按钮事件
     @objc optional func clickGuidePurchaseButton(baseViewController:UIViewController)//购买
     @objc optional func clickGuideRestoreButton(baseViewController:UIViewController)//恢复
+    @objc optional func clickPermissionButton(baseViewController:UIViewController)//申请权限按钮
+
     
     /// 引导页点击继续按钮
     /// - Parameters:
@@ -66,6 +68,7 @@ public class DYMGuideController: UIViewController {
         config.userContentController.add(self, name: "guide_purchase")
         config.userContentController.add(self, name: "guide_continue")
         config.userContentController.add(self, name: "guide_review")
+        config.userContentController.add(self, name: "xxx")
         // tj``:允许内联媒体播放
         config.allowsInlineMediaPlayback = true
         // tj``:媒体播放不需要用户操作
@@ -188,16 +191,16 @@ public class DYMGuideController: UIViewController {
                     urlStr = defaultGuidePath
                 } else {
                     
-//                    let sdkBundle = Bundle(for: DYMobileSDK.self)
-//                    guard let resourceBundleURL = sdkBundle.url(forResource: "DingYue_iOS_SDK", withExtension: "bundle")else { fatalError("DingYue_iOS_SDK.bundle not found, do not display SDK default paywall!") }
-//                    guard let resourceBundle = Bundle(url: resourceBundleURL)else { fatalError("Cannot access DingYue_iOS_SDK.bundle,do not display SDK default paywall!") }
-//                    let path = resourceBundle.path(forResource: "guide_index", ofType: "html")
-//                    let htmlUrl = URL(fileURLWithPath: path!)
-//                    webView.loadFileURL(htmlUrl, allowingReadAccessTo: htmlUrl)
-//                    urlStr = path!
+                    let sdkBundle = Bundle(for: DYMobileSDK.self)
+                    guard let resourceBundleURL = sdkBundle.url(forResource: "DingYue_iOS_SDK", withExtension: "bundle")else { fatalError("DingYue_iOS_SDK.bundle not found, do not display SDK default paywall!") }
+                    guard let resourceBundle = Bundle(url: resourceBundleURL)else { fatalError("Cannot access DingYue_iOS_SDK.bundle,do not display SDK default paywall!") }
+                    let path = resourceBundle.path(forResource: "guide_index", ofType: "html")
+                    let htmlUrl = URL(fileURLWithPath: path!)
+                    webView.loadFileURL(htmlUrl, allowingReadAccessTo: htmlUrl)
+                    urlStr = path!
                     
-                    self.trackWithPayWallInfo(eventName: "NO_LOCAL_WEB_GUIDE_CLOSE")
-                    self.delegate?.clickGuideCloseButton?(baseViewController: self,closeType: "NO_LOCAL_WEB_GUIDE_CLOSE")
+//                    self.trackWithPayWallInfo(eventName: "NO_LOCAL_WEB_GUIDE_CLOSE")
+//                    self.delegate?.clickGuideCloseButton?(baseViewController: self,closeType: "NO_LOCAL_WEB_GUIDE_CLOSE")
                 }
             }
         }
@@ -343,7 +346,28 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
 //        print("🔥🔥🔥---\(message.name)")
-        if message.name == "guide_close" {
+        if message.name == "xxx" {
+            
+            if let messageBody = message.body as? [String: Any],
+               let type = messageBody["type"] as? String {
+                
+                switch type {
+                case "Log":
+                    if let data = messageBody["data"] as? [String: Any],
+                       let event = data["event"] as? String {
+                        let extra = data["extra"] as? String
+                        // 处理日志事件
+                        self.eventManager.track(event: event, extra: extra )
+                    }
+                case "permission":
+                    debugPrint("request permission")
+                    self.delegate?.clickPermissionButton?(baseViewController: self)
+                default:
+                    print("未知的消息类型: \(type)")
+                }
+            }
+
+        }else if message.name == "guide_close" {
             self.trackWithPayWallInfo(eventName: "GUIDE_CLOSE")
             self.dismiss(animated: true, completion: nil)
             var type = ""
