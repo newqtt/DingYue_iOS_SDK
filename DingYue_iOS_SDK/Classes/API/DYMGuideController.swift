@@ -517,6 +517,7 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
                     }
                 }else{
                     self.dismiss(animated: true, completion: nil)
+                    self.delegate?.clickGuideCloseButton?(baseViewController: self,closeType: "")
                 }
             } else {
                 self.trackWithPayWallInfo(eventName: "GUIDE_PURCHASE_FAIL")
