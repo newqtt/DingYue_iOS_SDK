@@ -47,6 +47,7 @@ public class DYMGuideController: UIViewController {
     var guidePageSwiperSize:Int?
 
     private var startLoadTime:Int64 = 0
+    private var joinCircleCallback: String = ""
     
     lazy var customIndicatiorV:NVActivityIndicatorView =  {
        let view = NVActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 64, height: 34))
@@ -123,8 +124,25 @@ public class DYMGuideController: UIViewController {
             loadingTimer = Timer.scheduledTimer(timeInterval: 1.5, target: self, selector: #selector(changeLoadingStatus), userInfo: nil, repeats: true)
         }
         
+        // 添加观察者
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleNotification(_:)),
+            name: Notification.Name("JoinCircleSuccess"),
+            object: nil
+        )
     }
 
+    @objc func handleNotification(_ notification: Notification) {
+        // 处理通知
+        print("收到通知: \(notification.name)")
+        self.webView.evaluateJavaScript(joinCircleCallback) { (response, error) in
+            if let error = error {
+                print("回传成功: \(error)")
+            }
+        }
+    }
+    
     @objc func changeLoadingStatus() {
         if DYMDefaultsManager.shared.guideLoadingStatus == true {
             customIndicatiorV.isHidden = true
@@ -362,6 +380,12 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
                 case "permission":
                     debugPrint("request permission")
                     self.delegate?.clickPermissionButton?(baseViewController: self)
+                case "join_circle":
+                    NotificationCenter.default.post(name: Notification.Name("JoinCircle"), object: nil)
+                    if let h5_callback = (message.body as? Dictionary<String,Any>)?["h5_callback"] as? String {
+                        joinCircleCallback = "window.\(h5_callback)(\(true))"
+                        debugPrint("joinCircleCallback:\(joinCircleCallback)")
+                    }
                 default:
                     print("未知的消息类型: \(type)")
                 }
