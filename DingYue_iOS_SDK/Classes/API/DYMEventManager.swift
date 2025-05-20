@@ -12,10 +12,9 @@ class DYMEventManager {
     
     func track(event name: String, extra: String? = nil, user: String? = nil) {
         let sessionId = UserProperties.staticUuid
-        debugPrint("www sessionId ->>> \(sessionId)")
         let thisEvent = Event(name: name, extra: extra, user: user, sessionId: sessionId)
-        DispatchQueue.global(qos: .background).async {
-            self.syncEvents(event: thisEvent)
+        DispatchQueue.global(qos: .background).async { [event = thisEvent, weak self] in
+            self?.syncEvents(event: event)
         }
     }
 
