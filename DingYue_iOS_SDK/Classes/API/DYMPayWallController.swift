@@ -253,6 +253,7 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
                                              "url":webView.url,
                                              "fail_type":"didFailProvisional",
                                              "error":error.localizedDescription]
+        debugPrint("didFailProvisionalNavigation: \(error.localizedDescription)")
         DYMobileSDK.track(event: "SDK.Paywall.LoadFailed", extra: AGHelper.ag_convertDicToJSONStr(dictionary:ag_param_extra))
     }
     
@@ -395,8 +396,10 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
                             print("回传支付结果到JS时出错: \(error)")
                         }
                     }
+                    
                 }else{
                     self.dismiss(animated: true, completion: nil)
+                    self.delegate?.clickCloseButton?(baseViewController: self)
                 }
             } else {
                 self.trackWithPayWallInfo(eventName: "PURCHASE_FAIL")
