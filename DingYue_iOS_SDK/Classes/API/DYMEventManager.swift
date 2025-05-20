@@ -46,6 +46,7 @@ class DYMEventManager {
             let jsonString = String(data: jsonData, encoding: .utf8) {
             extraString = jsonString
         }
+        debugPrint("eventName ->>> \(eventName) extraString ->>> \(extraString)")
         DYMobileSDK.track(event: eventName, extra: extraString)
     }
     
