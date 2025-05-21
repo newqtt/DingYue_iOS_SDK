@@ -143,11 +143,7 @@ public typealias Parameters = [String: Any]
     }
 
     static var area: String? {
-        if(DYMobileSDK.checkIsSb()){
-           return "AS0"
-        }else{
-           return NSLocale.current.regionCode
-        }
+        return NSLocale.current.regionCode
     }
 
     static var language: String? {
