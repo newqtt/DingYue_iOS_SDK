@@ -134,14 +134,6 @@ import AdSupport
     ///Configure
     private func configure(completion:@escaping sessionActivateCompletion) {
         performInitialRequests(completion: completion)
-        UserProperties.appleSearchAdsAttribution { (attribution, error) in
-            if error != nil {
-                DYMobileSDK.track(event: "SDK.ASA.FIRST_FAILURE", extra: "get attribution error")
-            }else{
-                DYMobileSDK.track(event: "SDK.ASA.FIRST_SUCCESS", extra: "get attribution success")
-            }
-            
-        }
         if DYMobileSDK.enableRemoteNotifications {
             DYMAppDelegateSwizzler.startSwizzlingIfPossible(self)
         }

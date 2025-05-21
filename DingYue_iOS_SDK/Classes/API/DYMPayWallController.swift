@@ -226,17 +226,37 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
             productsArray.append(array)
         }
         self.tempCachedProducts = productsArray
+        
+       
+
         //传给内购页的数据字典
         var dic = [
             "system_language":languageCode,
             "products":productsArray,
-            "asaCampaignId": UserProperties.appleSearchAdsCampaignId ?? "",
         ] as [String : Any]
         
         if let extra = extras {
             dic["extra"] = extra
         }
-
+        let switchItems = DYMDefaultsManager.shared.cachedSwitchItems
+        // 检查force_test的值
+        var isForceTest = false
+        if let switchs = switchItems {
+            for item in switchs {
+                if item.variableName == "force_test" && item.variableValue {
+                    isForceTest = true
+                    break
+                }
+            }
+        }
+        
+        // 根据force_test的值设置asaCampaignId
+        if isForceTest {
+            dic["asaCampaignId"] = ""
+        } else {
+            dic["asaCampaignId"] = UserProperties.appleSearchAdsCampaignId ?? ""
+        }
+        
         let jsonString = getJSONStringFromDictionary(dictionary: dic as NSDictionary)
         debugPrint("jsonString:\(jsonString)")
         let data = jsonString.data(using: .utf8)

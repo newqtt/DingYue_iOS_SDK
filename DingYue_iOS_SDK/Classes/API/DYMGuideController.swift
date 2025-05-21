@@ -271,14 +271,33 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
             productsArray.append(array)
         }
         self.tempCachedProducts = productsArray
-            
+        
+       
         //传给内购页的数据字典
         var dic = [
             "system_language":languageCode,
             "products":productsArray,
             "purchaseSwitch":purchaseSwitch,
-            "asaCampaignId": UserProperties.appleSearchAdsCampaignId ?? "",
         ] as [String : Any]
+        
+        let switchItems = DYMDefaultsManager.shared.cachedSwitchItems
+        // 检查force_test的值
+        var isForceTest = false
+        if let switchs = switchItems {
+            for item in switchs {
+                if item.variableName == "force_test" && item.variableValue {
+                    isForceTest = true
+                    break
+                }
+            }
+        }
+        
+        // 根据force_test的值设置asaCampaignId
+        if isForceTest {
+            dic["asaCampaignId"] = ""
+        } else {
+            dic["asaCampaignId"] = UserProperties.appleSearchAdsCampaignId ?? ""
+        }
         
         if let extra = extras {
             dic["extra"] = extra

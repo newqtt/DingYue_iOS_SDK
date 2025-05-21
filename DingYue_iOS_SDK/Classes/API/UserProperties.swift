@@ -310,7 +310,6 @@ public typealias Parameters = [String: Any]
                             if let attribution = result as? [String: Any],
                                let campaignId = attribution["campaignId"] as? Int {
                                 _appleSearchAdsCampaignId = campaignId
-                                debugPrint("Apple Search Ads campaignId saved: \(campaignId)")
                             }
                         }
                         completion(result ?? ["":""], nil)
