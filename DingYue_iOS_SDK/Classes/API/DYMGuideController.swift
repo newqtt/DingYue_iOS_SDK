@@ -66,6 +66,7 @@ public class DYMGuideController: UIViewController {
         config.userContentController.add(self, name: "guide_purchase")
         config.userContentController.add(self, name: "guide_continue")
         config.userContentController.add(self, name: "guide_review")
+        config.userContentController.add(self, name: "get_asa_info")
         // tj``:允许内联媒体播放
         config.allowsInlineMediaPlayback = true
         // tj``:媒体播放不需要用户操作
@@ -465,6 +466,37 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
                         if let error = error {
                             print("Error calling guide_continue(): \(error)")
                         }
+                    }
+                }
+            }
+        }else if message.name == "get_asa_info" {
+            // 获取asaCampaignId值
+            var isForceTest = false
+            if let switchItems = DYMDefaultsManager.shared.cachedSwitchItems {
+                for item in switchItems {
+                    if item.variableName == "force_test" && item.variableValue {
+                        isForceTest = true
+                        break
+                    }
+                }
+            }
+            
+            // 根据force_test的值和asaCampaignId的情况确定传给JS的值
+            let jsValue: String
+            if isForceTest {
+                jsValue = "''"  // JS空字符串
+            } else if let campaignId = UserProperties.appleSearchAdsCampaignId {
+                jsValue = String(campaignId)  // 直接传递整数值，不加引号
+            } else {
+                jsValue = "''"  // JS空字符串
+            }
+            
+            // 如果js传递了回调函数名，则调用该回调函数并传回asaCampaignId
+            if let dic = message.body as? Dictionary<String, Any>, let callback = dic["callback"] as? String {
+                let jsCode = "window.\(callback)(\(jsValue))"
+                self.webView.evaluateJavaScript(jsCode) { (response, error) in
+                    if let error = error {
+                        print("回传asaCampaignId到JS时出错: \(error)")
                     }
                 }
             }
