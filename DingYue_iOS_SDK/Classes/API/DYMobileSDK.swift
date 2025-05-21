@@ -134,6 +134,10 @@ import AdSupport
     ///Configure
     private func configure(completion:@escaping sessionActivateCompletion) {
         performInitialRequests(completion: completion)
+        UserProperties.appleSearchAdsAttribution { (attribution, error) in
+            print(attribution)
+            
+        }
         if DYMobileSDK.enableRemoteNotifications {
             DYMAppDelegateSwizzler.startSwizzlingIfPossible(self)
         }
@@ -141,12 +145,12 @@ import AdSupport
     ///Initial requests
     private func performInitialRequests(completion:@escaping sessionActivateCompletion) {
         apiManager.completion = completion
-        sendAppleSearchAdsAttribution()
+       
         apiManager.startSession()
 
         iapManager.startObserverPurchase()
         
-       
+        sendAppleSearchAdsAttribution()
     }
 
     // MARK: - idfa
