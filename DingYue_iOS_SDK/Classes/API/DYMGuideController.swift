@@ -276,7 +276,8 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
         var dic = [
             "system_language":languageCode,
             "products":productsArray,
-            "purchaseSwitch":purchaseSwitch
+            "purchaseSwitch":purchaseSwitch,
+            "asaCampaignId": UserProperties.appleSearchAdsCampaignId ?? "",
         ] as [String : Any]
         
         if let extra = extras {
@@ -284,7 +285,7 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
         }
         dic["isVIP"] = DYMConfiguration.shared.guidePageConfig.isVIP
         let jsonString = getJSONStringFromDictionary(dictionary: dic as NSDictionary)
-        
+        debugPrint("asa jsonString:\(jsonString)")
         let data = jsonString.data(using: .utf8)
         let base64Str:String? = data?.base64EncodedString() as? String
         webView.evaluateJavaScript("iostojs('\(base64Str!)')") { (response, error) in

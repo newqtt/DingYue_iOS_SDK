@@ -141,11 +141,12 @@ import AdSupport
     ///Initial requests
     private func performInitialRequests(completion:@escaping sessionActivateCompletion) {
         apiManager.completion = completion
+        sendAppleSearchAdsAttribution()
         apiManager.startSession()
 
         iapManager.startObserverPurchase()
         
-        sendAppleSearchAdsAttribution()
+       
     }
 
     // MARK: - idfa
@@ -174,6 +175,7 @@ import AdSupport
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
             print(attribution)
             Self.reportSearchAds(attribution: attribution)
+            
         }
     }
 #endif
