@@ -135,7 +135,11 @@ import AdSupport
     private func configure(completion:@escaping sessionActivateCompletion) {
         performInitialRequests(completion: completion)
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
-            print(attribution)
+            if error != nil {
+                DYMobileSDK.track(event: "SDK.ASA.FIRST_FAILURE", extra: "get attribution error")
+            }else{
+                DYMobileSDK.track(event: "SDK.ASA.FIRST_SUCCESS", extra: "get attribution success")
+            }
             
         }
         if DYMobileSDK.enableRemoteNotifications {
@@ -178,6 +182,11 @@ import AdSupport
     private func reportAppleSearchAdsAttribution() {
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
             print(attribution)
+            if error != nil {
+                DYMobileSDK.track(event: "SDK.ASA.SECOND_FAILURE", extra: "get attribution error")
+            }else{
+                DYMobileSDK.track(event: "SDK.ASA.SECOND_SUCCESS", extra: "get attribution success")
+            }
             Self.reportSearchAds(attribution: attribution)
             
         }
