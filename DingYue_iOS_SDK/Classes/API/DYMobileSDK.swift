@@ -129,7 +129,6 @@ import AdSupport
        
         
         shared.configure(completion: completion)
-        checkPath()
     }
     ///Configure
     private func configure(completion:@escaping sessionActivateCompletion) {
