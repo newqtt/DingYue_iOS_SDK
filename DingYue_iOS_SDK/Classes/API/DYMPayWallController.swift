@@ -229,7 +229,8 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
         //传给内购页的数据字典
         var dic = [
             "system_language":languageCode,
-            "products":productsArray
+            "products":productsArray,
+            "asaCampaignId": UserProperties.appleSearchAdsCampaignId ?? "",
         ] as [String : Any]
         
         if let extra = extras {
@@ -237,6 +238,7 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
         }
 
         let jsonString = getJSONStringFromDictionary(dictionary: dic as NSDictionary)
+        debugPrint("jsonString:\(jsonString)")
         let data = jsonString.data(using: .utf8)
         let base64Str:String? = data?.base64EncodedString() as? String
         webView.evaluateJavaScript("iostojs('\(base64Str!)')") { (response, error) in
