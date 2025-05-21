@@ -175,9 +175,9 @@ import AdSupport
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
             print(attribution)
             if error != nil {
-                DYMobileSDK.track(event: "SDK.ASA.SECOND_FAILURE", extra: "get attribution error")
+                DYMobileSDK.track(event: "SDK.ASA.FAILURE", extra: "get attribution error")
             }else{
-                DYMobileSDK.track(event: "SDK.ASA.SECOND_SUCCESS", extra: "get attribution success")
+                DYMobileSDK.track(event: "SDK.ASA.SUCCESS", extra: "get attribution success")
             }
             Self.reportSearchAds(attribution: attribution)
             
