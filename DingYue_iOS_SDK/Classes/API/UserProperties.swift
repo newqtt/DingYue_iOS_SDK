@@ -304,7 +304,6 @@ public typealias Parameters = [String: Any]
                     do {
                         let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Parameters
                         if result != nil {
-                            DYMEventManager.shared.track(event: "ASA_SUCCESS", extra: "status code: 200")
                             
                             // 提取并保存 campaignId
                             if let attribution = result as? [String: Any],

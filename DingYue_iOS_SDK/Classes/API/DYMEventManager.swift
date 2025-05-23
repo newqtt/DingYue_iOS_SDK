@@ -12,10 +12,12 @@ class DYMEventManager {
     
     func track(event name: String, extra: String? = nil, user: String? = nil) {
         let sessionId = UserProperties.staticUuid
-        let thisEvent = Event(name: name, extra: extra, user: user, sessionId: sessionId)
-        DispatchQueue.global(qos: .background).async { [event = thisEvent, weak self] in
-            self?.syncEvents(event: event)
-        }
+//        let thisEvent = Event(name: name, extra: extra, user: user, sessionId: sessionId)
+//        DispatchQueue.global(qos: .background).async { [event = thisEvent, weak self] in
+//            self?.syncEvents(event: event)
+//        }
+        AliyunLogManager.shared.sendEventLog(eventName: name, eventData: ["sessionId": sessionId, "extras": extra, "user": user, "appId": DYMConstants.APIKeys.appId,
+                                                                         "timestampBegin": Int(Date().timeIntervalSince1970 * 1000)])
     }
 
     func track(event name: String, entrance: String = "", value: String = "", parameters: [String: Any]? = nil) {

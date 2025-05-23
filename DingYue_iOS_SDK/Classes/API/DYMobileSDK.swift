@@ -106,6 +106,8 @@ import AdSupport
     ///Activate SDK
     @objc public class func activate(completion:@escaping sessionActivateCompletion) {
         //读取DingYue.plist信息
+         // 使用默认配置快速初始化
+        AliyunLogManager.shared.quickInit()
         let path = Bundle.main.path(forResource: DYMConstants.AppInfoName.plistName, ofType: DYMConstants.AppInfoName.plistType)
         guard let plistPath = path else {
             return
