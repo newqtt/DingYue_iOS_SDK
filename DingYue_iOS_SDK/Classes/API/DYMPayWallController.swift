@@ -19,7 +19,8 @@ import ContactsUI
     @objc optional func clickCloseButton(baseViewController:UIViewController)//关闭按钮事件
     @objc optional func clickPurchaseButton(baseViewController:UIViewController)//购买
     @objc optional func clickRestoreButton(baseViewController:UIViewController)//恢复
-    @objc optional func clickPermissionButton(baseViewController:UIViewController)//申请权限按钮
+    @objc optional func clickPermissionButton(baseViewController:UIViewController, h5_callback:String?, Authorization completed:((Bool)->Void)?)//申请权限按钮
+    @objc optional func clickShareButton(baseViewController:UIViewController, shareBody:[String:Any])//申请权限按钮
 }
 
 public class DYMPayWallController: UIViewController {
@@ -324,7 +325,25 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
                 case "permission":
                     //TODO
                     debugPrint("request permission")
-                    self.delegate?.clickPermissionButton?(baseViewController: self)
+                    let h5_callback = (message.body as? Dictionary<String,Any>)?["h5_callback"] as? String
+                    self.delegate?.clickPermissionButton?(baseViewController: self, h5_callback: h5_callback) { dismiss in
+                        if let h5_callback = h5_callback {
+                            self.webView.evaluateJavaScript("\(h5_callback)()") { (response, error) in
+                                if let error = error {
+                                    print("回传支付结果到JS时出错: \(error)")
+                                }
+                            }
+                        }else{
+                            if dismiss {
+                                self.dismiss(animated: true, completion: nil)
+                            }
+                        }
+                    }
+                    
+                case "share":
+                    debugPrint("share")
+                    self.delegate?.clickShareButton?(baseViewController: self, shareBody: messageBody)
+                    
                 default:
                     print("未知的消息类型: \(type)")
                 }
