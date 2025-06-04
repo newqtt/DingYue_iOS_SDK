@@ -16,23 +16,30 @@ class DYMEventManager {
 //        DispatchQueue.global(qos: .background).async { [event = thisEvent, weak self] in
 //            self?.syncEvents(event: event)
 //        }
-        let extraDic = AGHelper.ag_jsonStrToJsonDic(extra)
+        
         var eventData:[String:Any] = ["sessionId": sessionId,
                          "user": user,
                          "appId": DYMConstants.APIKeys.appId,
                          "timestampBegin": Int(Date().timeIntervalSince1970 * 1000)]
         
-        if let extraDic = extraDic {
-            for (key, value) in extraDic {
-                if let dicValue = value as? [String:Any] {
-                    eventData["\(key)"] = AGHelper.ag_convertToJSONStr(dicValue)
-                }else if let arrValue = value as? [Any] {
-                    eventData["\(key)"] = AGHelper.ag_convertToJSONStr(arrValue)
-                }else{
-                    eventData["\(key)"] = "\(value)"
+        if let extra = extra {
+            
+            if let extraDic = AGHelper.ag_jsonStrToJsonDic(extra) {
+                for (key, value) in extraDic {
+                    if let dicValue = value as? [String:Any] {
+                        eventData["\(key)"] = AGHelper.ag_convertToJSONStr(dicValue)
+                    }else if let arrValue = value as? [Any] {
+                        eventData["\(key)"] = AGHelper.ag_convertToJSONStr(arrValue)
+                    }else{
+                        eventData["\(key)"] = "\(value)"
+                    }
                 }
+            }else{
+                eventData["extra"] = extra
             }
+            
         }
+
         
         AliyunLogManager.shared.sendEventLog(eventName: name, eventData: eventData)
     }
