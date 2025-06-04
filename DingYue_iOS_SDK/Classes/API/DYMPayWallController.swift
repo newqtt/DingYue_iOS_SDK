@@ -21,6 +21,7 @@ import ContactsUI
     @objc optional func clickRestoreButton(baseViewController:UIViewController)//恢复
     @objc optional func clickPermissionButton(baseViewController:UIViewController, h5_callback:String?, Authorization completed:((Bool)->Void)?)//申请权限按钮
     @objc optional func clickShareButton(baseViewController:UIViewController, shareBody:[String:Any])
+    @objc optional func clickImagePickerButton(baseViewController:UIViewController, pick complete:((String)->Void)?)
 }
 
 public class DYMPayWallController: UIViewController {
@@ -344,6 +345,20 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
                     debugPrint("share")
                     self.delegate?.clickShareButton?(baseViewController: self, shareBody: messageBody)
                     
+                case "image_picker":
+                    
+                    let h5_callback = (message.body as? Dictionary<String,Any>)?["h5_callback"] as? String
+                    self.delegate?.clickImagePickerButton?(baseViewController:self) { imageStr in
+                        if let h5_callback = h5_callback {
+                            let result = "data:image/png;base64," + imageStr
+                            let jsString = "\(h5_callback)('\(result)')"
+                            self.webView.evaluateJavaScript(jsString) { (response, error) in
+                                if let error = error {
+                                    print("回传支付结果到JS时出错: \(error)")
+                                }
+                            }
+                        }
+                    }
                 default:
                     print("未知的消息类型: \(type)")
                 }
