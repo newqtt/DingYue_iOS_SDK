@@ -16,8 +16,25 @@ class DYMEventManager {
 //        DispatchQueue.global(qos: .background).async { [event = thisEvent, weak self] in
 //            self?.syncEvents(event: event)
 //        }
-        AliyunLogManager.shared.sendEventLog(eventName: name, eventData: ["sessionId": sessionId, "extras": extra, "user": user, "appId": DYMConstants.APIKeys.appId,
-                                                                         "timestampBegin": Int(Date().timeIntervalSince1970 * 1000)])
+        let extraDic = AGHelper.ag_jsonStrToJsonDic(extra)
+        var eventData:[String:Any] = ["sessionId": sessionId,
+                         "user": user,
+                         "appId": DYMConstants.APIKeys.appId,
+                         "timestampBegin": Int(Date().timeIntervalSince1970 * 1000)]
+        
+        if let extraDic = extraDic {
+            for (key, value) in extraDic {
+                if let dicValue = value as? [String:Any] {
+                    eventData["\(key)"] = AGHelper.ag_convertToJSONStr(dicValue)
+                }else if let arrValue = value as? [Any] {
+                    eventData["\(key)"] = AGHelper.ag_convertToJSONStr(arrValue)
+                }else{
+                    eventData["\(key)"] = "\(value)"
+                }
+            }
+        }
+        
+        AliyunLogManager.shared.sendEventLog(eventName: name, eventData: eventData)
     }
 
     func track(event name: String, entrance: String = "", value: String = "", parameters: [String: Any]? = nil) {

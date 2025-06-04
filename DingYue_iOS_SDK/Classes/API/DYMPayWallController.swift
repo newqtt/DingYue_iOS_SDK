@@ -20,7 +20,7 @@ import ContactsUI
     @objc optional func clickPurchaseButton(baseViewController:UIViewController)//购买
     @objc optional func clickRestoreButton(baseViewController:UIViewController)//恢复
     @objc optional func clickPermissionButton(baseViewController:UIViewController, h5_callback:String?, Authorization completed:((Bool)->Void)?)//申请权限按钮
-    @objc optional func clickShareButton(baseViewController:UIViewController, shareBody:[String:Any])//申请权限按钮
+    @objc optional func clickShareButton(baseViewController:UIViewController, shareBody:[String:Any])
 }
 
 public class DYMPayWallController: UIViewController {

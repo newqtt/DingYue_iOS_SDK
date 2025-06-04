@@ -14,6 +14,11 @@ class AGHelper {
         return result
     }
     
+    static func ag_convertToJSONStr(_ value: Any) -> String? {
+        let result = AGValues.JSONString(value)
+        return result
+    }
+    
     // 将 UniqueUserObject 转换为字典的函数
     static func ag_convertToDic<T: Encodable>(_ object: T) -> [String: Any]? {
         do {
@@ -51,6 +56,15 @@ class AGHelper {
             }
         }
         return false
+    }
+    
+    static func ag_jsonStrToJsonDic(_ str:String?) -> [String:Any]? {
+        if let jsonData = str?.data(using: String.Encoding.utf8, allowLossyConversion: false),
+           let json = try? JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers) {
+           let dict = json as? [String : Any]
+           return dict
+        }
+        return nil
     }
     
 }
