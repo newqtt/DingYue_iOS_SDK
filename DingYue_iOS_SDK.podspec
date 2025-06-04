@@ -26,7 +26,7 @@ DESC
   s.dependency 'AnyCodable-FlightSchool', '~> 0.6.7'
   s.dependency 'SSZipArchive', '~> 2.4.3'
   s.dependency 'NVActivityIndicatorView', '~> 5.2.0'
-  s.dependency 'AliyunLogProducer', '~> 4.3.4'
+  s.dependency 'AliyunLogProducer', '~> 4.3.3'
 
   # Frameworks and system libraries
   s.frameworks = 'Foundation', 'StoreKit'
