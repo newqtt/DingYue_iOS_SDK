@@ -278,7 +278,6 @@ public typealias Parameters = [String: Any]
                 request.httpMethod = "POST"
                 request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
                 request.httpBody = Data(attributionToken.utf8)
-                let asa_startTime = Int64(Date().timeIntervalSince1970 * 1000)
                 let task = URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in
                     
                     if let r = retry, r != 0, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
@@ -313,14 +312,6 @@ public typealias Parameters = [String: Any]
                             }
                         }
                         completion(result ?? ["":""], nil)
-                        
-                        let asa_endTime = Int64(Date().timeIntervalSince1970 * 1000)
-                        let ag_param_extra:[String : Any] = [
-                            "timestamp":Int64(Date().timeIntervalSince1970 * 1000),
-                            "costTime":asa_endTime - asa_startTime,
-                            "result": result ?? ["":""]
-                        ]
-                        DYMobileSDK.track(event: "SDK.ASA.Success", extra: AGHelper.ag_convertDicToJSONStr(dictionary:ag_param_extra))
                     } catch {
                         completion(["":""], error)
                     }

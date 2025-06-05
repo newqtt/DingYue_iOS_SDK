@@ -173,12 +173,22 @@ import AdSupport
     }
 #if os(iOS)
     private func reportAppleSearchAdsAttribution() {
+        let asa_startTime = Int64(Date().timeIntervalSince1970 * 1000)
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
             print(attribution)
+            let asa_endTime = Int64(Date().timeIntervalSince1970 * 1000)
+            let ag_param_extra:[String : Any] = [
+                "timestamp":Int64(Date().timeIntervalSince1970 * 1000),
+                "costTime":asa_endTime - asa_startTime,
+                "result": attribution,
+                "error": error.debugDescription
+            ]
+            let extra = AGHelper.ag_convertDicToJSONStr(dictionary:ag_param_extra)
+            
             if error != nil {
-                DYMobileSDK.track(event: "SDK.ASA.FAILURE", extra: "get attribution error")
+                DYMobileSDK.track(event: "SDK.ASA.FAILURE", extra: extra)
             }else{
-                DYMobileSDK.track(event: "SDK.ASA.SUCCESS", extra: "get attribution success")
+                DYMobileSDK.track(event: "SDK.ASA.SUCCESS", extra: extra)
             }
             Self.reportSearchAds(attribution: attribution)
             
