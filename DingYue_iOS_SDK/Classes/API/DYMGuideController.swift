@@ -18,7 +18,9 @@ import NVActivityIndicatorView
     @objc optional func clickGuideCloseButton(baseViewController:UIViewController,closeType:String)//关闭按钮事件
     @objc optional func clickGuidePurchaseButton(baseViewController:UIViewController)//购买
     @objc optional func clickGuideRestoreButton(baseViewController:UIViewController)//恢复
-    @objc optional func clickPermissionButton(baseViewController:UIViewController)//申请权限按钮
+    @objc optional func clickPermissionButton(baseViewController:UIViewController, h5_callback:String?, Authorization completed:((Bool)->Void)?)//申请权限按钮
+    @objc optional func clickShareButton(baseViewController:UIViewController, shareBody:[String:Any])
+    @objc optional func clickImagePickerButton(baseViewController:UIViewController, pick complete:((String)->Void)?)
 
     
     /// 引导页点击继续按钮
@@ -399,8 +401,40 @@ extension DYMGuideController: WKNavigationDelegate, WKScriptMessageHandler {
                         self.eventManager.track(event: event, extra: extra )
                     }
                 case "permission":
+                    //TODO
                     debugPrint("request permission")
-                    self.delegate?.clickPermissionButton?(baseViewController: self)
+                    let h5_callback = (message.body as? Dictionary<String,Any>)?["h5_callback"] as? String
+                    self.delegate?.clickPermissionButton?(baseViewController: self, h5_callback: h5_callback) { dismiss in
+                        if let h5_callback = h5_callback {
+                            self.webView.evaluateJavaScript("\(h5_callback)()") { (response, error) in
+                                if let error = error {
+                                    print("回传支付结果到JS时出错: \(error)")
+                                }
+                            }
+                        }else{
+                            if dismiss {
+                                self.dismiss(animated: true, completion: nil)
+                            }
+                        }
+                    }
+                case "share":
+                    debugPrint("share")
+                    self.delegate?.clickShareButton?(baseViewController: self, shareBody: messageBody)
+                    
+                case "image_picker":
+                    
+                    let h5_callback = (message.body as? Dictionary<String,Any>)?["h5_callback"] as? String
+                    self.delegate?.clickImagePickerButton?(baseViewController:self) { imageStr in
+                        if let h5_callback = h5_callback {
+                            let result = "data:image/png;base64," + imageStr
+                            let jsString = "\(h5_callback)('\(result)')"
+                            self.webView.evaluateJavaScript(jsString) { (response, error) in
+                                if let error = error {
+                                    print("回传支付结果到JS时出错: \(error)")
+                                }
+                            }
+                        }
+                    }
                 case "join_circle":
                     NotificationCenter.default.post(name: Notification.Name("JoinCircle"), object: nil)
                     if let h5_callback = (message.body as? Dictionary<String,Any>)?["h5_callback"] as? String {
